@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: TPI-ANALISISDESENALES
+Version: 0.1.0
+Summary: Libreria para analisis y procesamiento de senales fisiologicas.
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: pandas
+Requires-Dist: pytest
+
+# TPI PDA 2026
+
+## Autores
+- [x] FLORIN Matías
+- [x] GONZALEZ Sergio
+
+### Para intalar todas las dependencias utilizar:
+
+pip install -r requirements.txt
+
+### Para verificá que todo quedó instalado corriendo:
+
+python -m pytest tests/
