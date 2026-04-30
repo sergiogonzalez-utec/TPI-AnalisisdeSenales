@@ -1,6 +1,6 @@
 import numpy as np
-from src.eventos import Eventos
-from src.raw_signal import RawSignal
+from tpi_analisisdesenales.eventos import Eventos
+from tpi_analisisdesenales.raw_signal import RawSignal
 
 class Epocas:
     def __init__(self, signal: RawSignal, eventos: Eventos, tmin: float, tmax: float, picks=None, reject=None):

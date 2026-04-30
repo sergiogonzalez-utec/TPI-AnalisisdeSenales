@@ -13,7 +13,8 @@ dependencies = [
     "scipy",
     "matplotlib",
     "pandas",
-    "pytest"
+    "pytest",
+    "plotly"
 ]
 
 [tool.setuptools]
