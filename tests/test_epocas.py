@@ -1,8 +1,8 @@
 import numpy as np
-from src.info import Info
-from src.raw_signal import RawSignal
-from src.eventos import Eventos
-from src.epocas import Epocas
+from tpi_analisisdesenales.info import Info
+from tpi_analisisdesenales.raw_signal import RawSignal
+from tpi_analisisdesenales.eventos import Eventos
+from tpi_analisisdesenales.epocas import Epocas
 
 def test_epocas_extraction_and_average():
     info = Info(ch_names=["C3", "C4"], sfreq=250.0)

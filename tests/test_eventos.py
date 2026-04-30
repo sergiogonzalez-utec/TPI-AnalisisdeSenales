@@ -1,4 +1,4 @@
-from src.eventos import Eventos
+from tpi_analisisdesenales.eventos import Eventos
 
 def test_eventos_add_and_rename():
     ev = Eventos()

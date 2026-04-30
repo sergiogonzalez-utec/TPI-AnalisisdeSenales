@@ -1,4 +1,4 @@
-from src.anotaciones import Anotaciones
+from tpi_analisisdesenales.anotaciones import Anotaciones
 
 def test_anotaciones_add_and_find():
     anot = Anotaciones()
