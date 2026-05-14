@@ -345,15 +345,15 @@ class RawSignal:
         return self
     
     def add_annotation(self, onset, duration, description, ch_names=None):
-    if self.anotaciones is None:
-        self.anotaciones = Anotaciones()
+        if self.anotaciones is None:
+            self.anotaciones = Anotaciones()
 
-    self.anotaciones.add(
-        onset=onset,
-        duration=duration,
-        description=description,
-        ch_names=ch_names
-    )
+        self.anotaciones.add(
+            onset=onset,
+            duration=duration,
+            description=description,
+            ch_names=ch_names
+        )
 
     def get_channel(self, ch):
         """
