@@ -542,23 +542,23 @@ class EEGSignal:
 
         return aplicar_hilbert(data)
 
-   def hilbert_transform(self, picks=None):
-    """
-    Calcula la transformada de Hilbert para uno o mas canales.
+    def hilbert_transform(self, picks=None):
+        """
+            Calcula la transformada de Hilbert para uno o mas canales.
 
-    El calculo real se delega al modulo preprocesamiento/filtros.py.
-    """
+        El calculo real se delega al modulo preprocesamiento/filtros.py.
+        """
 
-    from .preprocesamiento.filtros import aplicar_hilbert
+        from .preprocesamiento.filtros import aplicar_hilbert
 
-    indices = self._resolve_picks(picks)
+        indices = self._resolve_picks(picks)
 
-    if self.data.ndim == 2:
-        data = self.data[indices, :]
-    else:
-        data = self.data[:, indices, :]
+        if self.data.ndim == 2:
+            data = self.data[indices, :]
+        else:
+            data = self.data[:, indices, :]
 
-    return aplicar_hilbert(data)
+        return aplicar_hilbert(data)
 
     def _resolve_picks(
         self,
