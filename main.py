@@ -1,70 +1,72 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from tpi_analisisdesenales.info import Info
-from tpi_analisisdesenales.anotaciones import Anotaciones
+from tpi_analisisdesenales.raw_signal import RawSignal
 from tpi_analisisdesenales.eventos import Eventos
-from tpi_analisisdesenales.visualizacion import PlotEngine
+from tpi_analisisdesenales.anotaciones import Anotaciones
+from tpi_analisisdesenales.epocas import Epocas
 
 
 def main():
-    # Crear metadata de la señal
+    print("Ejecutando main.py")
+
     info = Info(
         ch_names=["C3", "C4"],
-        sfreq=250.0,
-        ch_types=["eeg", "eeg"],
-        subject_info={"id": "S01"},
+        sfreq=100.0,
+        ch_types=["EEG", "EEG"],
     )
 
-    # Crear datos simulados: 2 canales y 1000 muestras
-    data = np.random.rand(2, 1000)
+    data = np.random.randn(2, 1000)
 
-    # Crear eventos del experimento
-    ev = Eventos()
-    ev.add(sample=200, event_id=1)
-    ev.add(sample=600, event_id=2)
-
-    print("Eventos:")
-    print(ev.get_events())
-
-    # Crear anotaciones dentro del rango visible de la señal
-    anot = Anotaciones(
-        onset=[],
-        duration=[],
-        description=[],
+    eventos = Eventos(
+        samples=[200, 500, 800],
+        event_id=[1, 1, 2],
     )
-    anot.add(onset=1.0, duration=0.5, description="Artefacto ocular")
-    anot.add(onset=2.5, duration=0.4, description="Movimiento muscular")
 
-    print("Anotaciones:")
-    print(anot.get_annotations())
+    anotaciones = Anotaciones()
 
-    # Crear motor grafico directamente
-    engine = PlotEngine(
+    anotaciones.add(
+        onset=2.5,
+        duration=1.0,
+        description="artefacto",
+        ch_names=["C3"],
+    )
+
+    raw = RawSignal(
         data=data,
-        sfreq=info.sfreq,
-        ch_names=info.ch_names,
-        anotaciones=anot,
+        info=info,
+        eventos=eventos,
+        anotaciones=anotaciones,
     )
 
-    # Mostrar grafico de señales
-    fig = engine.plot_signals(
-        start=0.0,
-        stop=4.0,
-        superpose=False,
-        show_annotations=True,
-        fill_annotations=True,
-        title="Señal cruda con anotaciones",
-    )
-    fig.show()
+    print("Senal creada:")
+    print(raw)
 
-    # Mostrar grafico de media y desvio
-    fig2 = engine.plot_mean_std(
-        start=0.0,
-        stop=4.0,
-        title="Media y desvio estandar",
-    )
-    fig2.show()
+    print("\nEventos:")
+    print(eventos.get_events())
 
+    print("\nAnotaciones:")
+    print(anotaciones.get_annotations())
+
+    epocas = Epocas(
+        raw=raw,
+        eventos=eventos,
+        event_id=1,
+        tmin=-0.1,
+        tmax=0.4,
+    )
+
+    print("\nEpocas creadas:")
+    print(epocas)
+
+    print("\nForma de los datos de epocas:")
+    print(epocas.get_data().shape)
+
+    fig = raw.plot()
+
+    if fig is not None:
+        fig.show()
 
 if __name__ == "__main__":
     main()

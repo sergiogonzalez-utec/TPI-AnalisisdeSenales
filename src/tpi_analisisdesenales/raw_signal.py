@@ -5,9 +5,9 @@
 import numpy as np
 import pandas as pd
 
-from .info import Info
-from .eventos import Eventos
-from .anotaciones import Anotaciones
+from tpi_analisisdesenales.info import Info
+from tpi_analisisdesenales.eventos import Eventos
+from tpi_analisisdesenales.anotaciones import Anotaciones
 
 
 class RawSignal:
@@ -245,6 +245,33 @@ class RawSignal:
 
         return pd.DataFrame(rows)
 
+    def plot(
+            self,
+            picks=None,
+            start: float = 0.0,
+            stop=None,
+            superpose: bool = False,
+            show_annotations: bool = True,
+            fill_annotations: bool = True,
+            title: str = "Visualizacion de senal continua",
+        ):
+            """
+            Grafica la senal continua usando el modulo de visualizacion.
+            """
+
+            from .visualizacion.plot_raw import plot_raw
+
+            return plot_raw(
+                raw=self,
+                picks=picks,
+                start=start,
+                stop=stop,
+                superpose=superpose,
+                show_annotations=show_annotations,
+                fill_annotations=fill_annotations,
+                title=title,
+            )
+    
     def resumen(self):
         """
         Devuelve un resumen general de la señal en forma de diccionario.
@@ -467,3 +494,4 @@ class RawSignal:
             f"sfreq={r['Frecuencia de muestreo']}, "
             f"duration={r['Duracion']:.3f} s)"
         )
+    

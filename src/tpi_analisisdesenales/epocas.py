@@ -1,64 +1,136 @@
 import numpy as np
-from tpi_analisisdesenales.eventos import Eventos
-from tpi_analisisdesenales.raw_signal import RawSignal
+
 
 class Epocas:
-    def __init__(self, signal: RawSignal, eventos: Eventos, tmin: float, tmax: float, picks=None, reject=None):
+    """
+    Representa segmentos de senal extraidos alrededor de eventos.
+
+    Cada epoca se obtiene a partir de un evento y una ventana temporal
+    definida por tmin y tmax.
+    """
+
+    def __init__(
+        self,
+        raw,
+        eventos,
+        event_id=None,
+        tmin: float = -0.2,
+        tmax: float = 0.8,
+    ) -> None:
         """
-        Clase Epocas: representa segmentos de la señal (epochs) definidos por eventos.
+        Crea epocas a partir de una senal continua y sus eventos.
 
         Parameters
         ----------
-        signal : RawSignal
-            Señal cruda de la cual se extraen las épocas.
-        eventos : Eventos
-            Objeto Eventos que contiene los marcadores.
+        raw
+            Objeto RawSignal que contiene la senal continua.
+
+        eventos
+            Objeto Eventos con las marcas de eventos.
+
+        event_id : int | list[int] | None
+            Identificador o lista de identificadores de eventos a utilizar.
+            Si es None, se usan todos los eventos.
+
         tmin : float
-            Tiempo inicial relativo al evento (en segundos).
+            Tiempo inicial de la epoca respecto al evento, en segundos.
+
         tmax : float
-            Tiempo final relativo al evento (en segundos).
-        picks : list, optional
-            Lista de canales a incluir.
-        reject : dict, optional
-            Criterios de rechazo (ej. amplitud máxima).
+            Tiempo final de la epoca respecto al evento, en segundos.
         """
-        self.signal = signal
+
+        if tmax <= tmin:
+            raise ValueError("tmax debe ser mayor que tmin.")
+
+        self.raw = raw
         self.eventos = eventos
-        self.tmin = tmin
-        self.tmax = tmax
-        self.picks = picks or signal.info.ch_names
-        self.reject = reject or {}
-        self.data = self._extract_epochs()
+        self.event_id = event_id
+        self.tmin = float(tmin)
+        self.tmax = float(tmax)
+        self.sfreq = raw.sfreq
+        self.info = raw.info
 
-    def _extract_epochs(self):
-        """Extrae las épocas de la señal según los eventos."""
-        epochs = []
-        samples_tmin = int(self.tmin * self.signal.sfreq)
-        samples_tmax = int(self.tmax * self.signal.sfreq)
+        self.data, self.selected_events = self._create_epochs()
 
-        for ev in self.eventos.get_events():
-            start = ev["sample"] + samples_tmin
-            end = ev["sample"] + samples_tmax
-            if 0 <= start < self.signal.data.shape[1] and end <= self.signal.data.shape[1]:
-                epochs.append(self.signal.data[:, start:end])
-        return np.array(epochs)
+    def _create_epochs(self):
+        """
+        Extrae las epocas desde la senal continua.
+        """
+
+        eventos_df = self.eventos.get_events()
+
+        if self.event_id is not None:
+            if isinstance(self.event_id, int):
+                event_ids = [self.event_id]
+            else:
+                event_ids = list(self.event_id)
+
+            eventos_df = eventos_df[eventos_df["event_id"].isin(event_ids)]
+
+        n_pre = int(round(self.tmin * self.sfreq))
+        n_post = int(round(self.tmax * self.sfreq))
+        n_times = n_post - n_pre
+
+        epocas = []
+        eventos_validos = []
+
+        for _, evento in eventos_df.iterrows():
+            sample = int(evento["sample"])
+
+            start = sample + n_pre - self.raw.first_samp
+            stop = sample + n_post - self.raw.first_samp
+
+            if start < 0 or stop > self.raw.data.shape[1]:
+                continue
+
+            epoca = self.raw.data[:, start:stop]
+
+            if epoca.shape[1] == n_times:
+                epocas.append(epoca)
+                eventos_validos.append(evento)
+
+        if len(epocas) == 0:
+            data = np.empty((0, self.raw.data.shape[0], n_times))
+        else:
+            data = np.stack(epocas, axis=0)
+
+        return data, eventos_validos
 
     def get_data(self):
-        """Devuelve los datos de las épocas."""
+        """
+        Devuelve los datos de las epocas.
+
+        Shape:
+        n_epocas x n_canales x n_muestras
+        """
+
         return self.data
 
     def average(self):
-        """Calcula el promedio de todas las épocas."""
-        return np.mean(self.data, axis=0) if len(self.data) > 0 else None
+        """
+        Calcula el promedio de todas las epocas.
 
-    def drop_channels(self, ch_names: list):
-        """Elimina canales de las épocas."""
-        indices = [self.signal.info.ch_names.index(ch) for ch in ch_names if ch in self.signal.info.ch_names]
-        self.data = np.delete(self.data, indices, axis=1)
-        self.signal.info.ch_names = [ch for ch in self.signal.info.ch_names if ch not in ch_names]
+        Devuelve un arreglo de shape:
+        n_canales x n_muestras
+        """
+
+        if len(self) == 0:
+            raise ValueError("No hay epocas para promediar.")
+
+        return np.mean(self.data, axis=0)
 
     def __len__(self):
-        return len(self.data)
+        """
+        Devuelve la cantidad de epocas extraidas.
+        """
 
-    def __str__(self):
-        return f"Epocas: {len(self)} segmentos de {self.tmin}-{self.tmax} s"
+        return self.data.shape[0]
+
+    def __repr__(self):
+        return (
+            f"Epocas(n_epocas={len(self)}, "
+            f"n_canales={self.data.shape[1]}, "
+            f"n_muestras={self.data.shape[2]}, "
+            f"tmin={self.tmin}, tmax={self.tmax})"
+        )
+    
