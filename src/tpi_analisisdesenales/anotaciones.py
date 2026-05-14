@@ -22,9 +22,9 @@ class Anotaciones:
 
     def __init__(
         self,
-        onset: npt.NDArray[np.floating] | Sequence[float],
-        duration: Sequence[float],
-        description: Sequence[str],
+        onset: Optional[npt.NDArray[np.floating] | Sequence[float]] = None,
+        duration: Optional[Sequence[float]] = None,
+        description: Optional[Sequence[str]] = None,
         t0: Optional[float] = None,
         ch_names: Optional[Sequence[Sequence[str]]] = None,
     ) -> None:
@@ -45,6 +45,16 @@ class Anotaciones:
             Canales asociados a cada anotacion.
             Ejemplo: [[], ["C3"], ["C4", "Cz"]]
         """
+        if onset is None and duration is None and description is None:
+            self._onset = np.array([], dtype=float)
+            self._duration = []
+            self._description = []
+            self._t0 = t0
+            self._ch_names = []
+            return
+
+        if onset is None or duration is None or description is None:
+            raise ValueError("onset, duration y description deben ingresarse juntos.")
 
         # Convertimos onset a numpy array para poder validarlo y manipularlo
         # de forma uniforme aunque el usuario pase una lista.
@@ -183,27 +193,35 @@ class Anotaciones:
 
         Este metodo modifica la instancia actual.
         """
-        # Validamos onset.
+
         if onset < 0:
             raise ValueError("onset no puede ser negativo.")
 
-        # Validamos duration.
         if duration < 0:
             raise ValueError("duration no puede ser negativo.")
 
-        # Validamos description.
         if not isinstance(description, str) or description.strip() == "":
-            raise ValueError("description debe ser un string no vacio.")
+            raise ValueError("description debe ser un texto no vacio.")
 
-        # Si no se pasan canales, asociamos una lista vacia.
         if ch_names is None:
-            ch_names = []
+            ch_names_list = []
+        else:
+            if isinstance(ch_names, str):
+                raise TypeError("ch_names debe ser una secuencia de nombres, no un string.")
 
-        # Agregamos la nueva anotacion a cada estructura interna.
+            ch_names_list = list(ch_names)
+
+            if len(ch_names_list) == 0:
+                raise ValueError("ch_names no puede estar vacio si se especifica.")
+
+            for ch in ch_names_list:
+                if not isinstance(ch, str) or ch.strip() == "":
+                    raise ValueError("Cada canal en ch_names debe ser un string no vacio.")
+
         self._onset = np.append(self._onset, float(onset))
         self._duration.append(float(duration))
         self._description.append(description)
-        self._ch_names.append(list(ch_names))
+        self._ch_names.append(ch_names_list)
 
     def append(
         self,
