@@ -5,10 +5,10 @@
 import numpy as np
 import pandas as pd
 
-from tpi_analisisdesenales.info import Info
-from tpi_analisisdesenales.eventos import Eventos
-from tpi_analisisdesenales.anotaciones import Anotaciones
 
+from ..info.info import Info
+from ..eventos.eventos import Eventos
+from ..eventos.anotaciones import Anotaciones
 
 class RawSignal:
     """

@@ -1,5 +1,6 @@
-from tpi_analisisdesenales.raw_signal import RawSignal
-
+from .raw_signal import RawSignal
+from ..signals.raw_signal import RawSignal
+from ..eventos.eventos import Eventos
 class ECGSignal(RawSignal):
     def __init__(self, data, sfreq, info, eventos=None, anotaciones=None):
         super().__init__(data, sfreq, info, eventos, anotaciones)

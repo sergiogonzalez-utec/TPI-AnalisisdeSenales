@@ -1,6 +1,7 @@
 import numpy as np
 from tpi_analisisdesenales.info import Info
-from tpi_analisisdesenales.raw_signal import RawSignal
+
+from tpi_analisisdesenales.signals import RawSignal
 
 def test_rawsignal_describe_and_crop():
     info = Info(ch_names=["C3", "C4"], sfreq=250.0)

@@ -1,5 +1,6 @@
 import numpy as np
-
+from ..signals.raw_signal import RawSignal
+from ..eventos.eventos import Eventos
 
 class Epocas:
     """

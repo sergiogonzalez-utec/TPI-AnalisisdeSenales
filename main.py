@@ -1,10 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from tpi_analisisdesenales import Info, Anotaciones, Eventos, PlotEngine
 from tpi_analisisdesenales.info import Info
-from tpi_analisisdesenales.raw_signal import RawSignal
 from tpi_analisisdesenales.eventos import Eventos
-from tpi_analisisdesenales.anotaciones import Anotaciones
 from tpi_analisisdesenales.epocas import Epocas
 
 

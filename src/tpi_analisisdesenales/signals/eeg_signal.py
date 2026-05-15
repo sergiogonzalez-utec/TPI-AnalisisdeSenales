@@ -7,10 +7,9 @@ from typing import Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from .info import Info
-from .anotaciones import Anotaciones
-from .eventos import Eventos
-
+from .raw_signal import RawSignal
+from ..info.info import Info
+from ..eventos.anotaciones import Anotaciones
 
 class EEGSignal:
     """
