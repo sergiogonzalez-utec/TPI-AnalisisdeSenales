@@ -65,6 +65,8 @@ class Info:
             Este valor puede quedar en None al inicio y luego ser completado
             desde RawSignal cuando se cargue el archivo de datos.
         """
+#-----------VALIDACIONES INICIALES----------------
+
 
         # Validamos que ch_names sea una lista y que no este vacia.
         # Esto es importante porque casi todas las operaciones futuras
@@ -86,7 +88,13 @@ class Info:
         if len(ch_types) != len(ch_names):
             raise ValueError("ch_types debe tener la misma longitud que ch_names.")
 
+#------------FIN DE VALIDACIONES----------------
+
+
+#-----------GUARDADO DE ATRIBUTOS----------------
         # Guardamos internamente los atributos principales.
+
+
         # Se usan con guion bajo para indicar que son internos
         # y luego acceder a ellos mediante propiedades.
         self._ch_names = list(ch_names)

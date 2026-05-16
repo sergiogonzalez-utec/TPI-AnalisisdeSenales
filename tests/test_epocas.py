@@ -1,9 +1,9 @@
 import numpy as np
 
 from tpi_analisisdesenales.info import Info
-from tpi_analisisdesenales.raw_signal import RawSignal
+from tpi_analisisdesenales.signals.raw_signal import RawSignal
 from tpi_analisisdesenales.eventos import Eventos
-from tpi_analisisdesenales.epocas import Epocas
+from tpi_analisisdesenales.epocas import epocas
 
 
 def test_epocas_crea_segmentos_correctamente():

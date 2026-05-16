@@ -3,12 +3,14 @@
 #intento de nuevo CAPAZ CONVIENE ACTUALIZAR EL *********************************UML***************
 
 import numpy as np
-import pandas as pd
+import pandas as pd 
 
 
 from ..info.info import Info
 from ..eventos.eventos import Eventos
 from ..eventos.anotaciones import Anotaciones
+from ..visualizacion.plot_raw import PlotEngine
+from ..visualizacion.plot_raw import plot_raw
 
 class RawSignal:
     """
@@ -259,7 +261,6 @@ class RawSignal:
             Grafica la senal continua usando el modulo de visualizacion.
             """
 
-            from .visualizacion.plot_raw import plot_raw
 
             return plot_raw(
                 raw=self,
