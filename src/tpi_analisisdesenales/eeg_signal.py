@@ -7,11 +7,10 @@ from typing import Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from .raw_signal import RawSignal
-from ..info import Info
-from ..eventos import Anotaciones
-from ..eventos import Eventos
-from ..epocas import Epocas
+from .info import Info
+from .eventos import Anotaciones
+from .eventos import Eventos
+
 
 class EEGSignal:
     """
@@ -350,7 +349,7 @@ class EEGSignal:
         Aplica un filtro pasabanda y retorna una nueva instancia de EEGSignal.
         """
 
-        from tpi_analisisdesenales.preprocesamiento.filtros import filtro_pasabanda
+        from .preprocesamiento.filtros import filtro_pasabanda
 
         new_data = filtro_pasabanda(
             data=self.data,
@@ -380,7 +379,7 @@ class EEGSignal:
         Aplica un filtro Notch y retorna una nueva instancia de EEGSignal.
         """
 
-        from tpi_analisisdesenales.preprocesamiento.filtros import filtro_notch
+        from .preprocesamiento.filtros import filtro_notch
 
         new_data = filtro_notch(
             data=self.data,
@@ -416,7 +415,7 @@ class EEGSignal:
         Retorna una instancia de Epocas.
         """
 
-        from ..epocas import Epocas
+        from .epocas import Epocas
 
         if self.data.ndim == 3:
             raise ValueError(
@@ -446,7 +445,7 @@ class EEGSignal:
         if self.data.ndim == 3:
             raise ValueError("plot() esta pensado para datos continuos 2D.")
 
-        from ..visualizacion.plot_raw import plot_raw
+        from .visualizacion.plot_raw import plot_raw
 
         return plot_raw(
             raw=self,
@@ -532,7 +531,7 @@ class EEGSignal:
         El calculo real se delega al modulo preprocesamiento/hilbert.py.
         """
 
-        from ..preprocesamiento.filtros import aplicar_hilbert
+        from .preprocesamiento.filtros import aplicar_hilbert
 
         indices = self._resolve_picks(picks)
 
@@ -550,7 +549,7 @@ class EEGSignal:
         El calculo real se delega al modulo preprocesamiento/filtros.py.
         """
 
-        from ..preprocesamiento.filtros import aplicar_hilbert
+        from .preprocesamiento.filtros import aplicar_hilbert
 
         indices = self._resolve_picks(picks)
 
