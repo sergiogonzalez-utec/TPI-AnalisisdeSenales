@@ -1,8 +1,6 @@
-from .info import Info
-from .eventos import Anotaciones, Eventos
-from .signals import RawSignal, EEGSignal, ECGSignal, EMGSignal
-from .epocas import Epocas
-from .visualizacion import PlotEngine
+"""
+Subpaquete de senales.
+"""
 
 __all__ = [
     "Info",

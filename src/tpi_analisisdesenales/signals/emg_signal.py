@@ -3,9 +3,9 @@ import numpy as np
 import pandas as pd
 
 from .raw_signal import RawSignal
-from .anotaciones import Anotaciones
-from .eventos import Eventos
-from .info import Info
+from tpi_analisisdesenales.eventos.anotaciones import Anotaciones
+from tpi_analisisdesenales.eventos.eventos import Eventos
+from tpi_analisisdesenales.info.info import Info
 
 
 class EMGSignal(RawSignal):

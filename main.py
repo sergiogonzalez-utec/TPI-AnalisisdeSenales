@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
+from tpi_analisisdesenales.info.info import Info
 from tpi_analisisdesenales.signals.raw_signal import RawSignal
-from tpi_analisisdesenales import Info, Anotaciones, Eventos, PlotEngine
-from tpi_analisisdesenales.info import Info
-from tpi_analisisdesenales.eventos import Eventos
-from tpi_analisisdesenales.epocas import epocas
+from tpi_analisisdesenales.eventos.eventos import Eventos
+from tpi_analisisdesenales.eventos.anotaciones import Anotaciones
+from tpi_analisisdesenales.epocas.epocas import Epocas
 
 
 def main():
@@ -48,7 +49,7 @@ def main():
     print("\nAnotaciones:")
     print(anotaciones.get_annotations())
 
-    epocas = epocas(
+    epocas = Epocas(
         raw=raw,
         eventos=eventos,
         event_id=1,
