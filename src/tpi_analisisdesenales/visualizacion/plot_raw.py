@@ -3,7 +3,6 @@ Modulo para graficar objetos RawSignal usando PlotEngine.
 """
 
 from typing import Optional, Sequence
-
 from .plot_engine import PlotEngine
 
 
@@ -72,7 +71,7 @@ def plot_raw(
         fill_annotations=fill_annotations,
         title=title,
     )
-
+    fig.show()
     return fig
 
 

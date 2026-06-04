@@ -1,7 +1,3 @@
-
-
-#intento de nuevo CAPAZ CONVIENE ACTUALIZAR EL *********************************UML***************
-
 import numpy as np
 import pandas as pd 
 
