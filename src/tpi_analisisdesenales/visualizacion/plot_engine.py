@@ -317,7 +317,7 @@ class PlotEngine:
                     fig.add_vrect(
                         x0=onset,
                         x1=onset + duration,
-                        opacity=0.18,
+                        fillcolor="rgba(255, 0, 0, 0.15)",
                         line_width=0,
                         annotation_text=description,
                         annotation_position="top left",
@@ -327,9 +327,10 @@ class PlotEngine:
                         x=onset,
                         line_dash="dash",
                         line_width=1,
+                        line_color="rgba(0, 0, 0, 0.55)",
                         annotation_text=description,
                         annotation_position="top right",
-                    )
+                    )   
 
         fig.update_layout(
             title=title,

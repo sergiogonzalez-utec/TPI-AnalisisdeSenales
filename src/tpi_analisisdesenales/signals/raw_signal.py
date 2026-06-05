@@ -72,8 +72,8 @@ class RawSignal:
 
         # Guardamos metadata y estructuras temporales asociadas
         self.info = info
-        self.eventos = eventos if eventos is not None else Eventos()
-        self.anotaciones = anotaciones
+        self.eventos = eventos if eventos is not None else Eventos(self.info.sfreq)
+        self.anotaciones = anotaciones if anotaciones is not None else Anotaciones()
         self.first_samp = first_samp
 
         # Guardamos en Info la cantidad de muestras para mantener consistente
@@ -442,7 +442,7 @@ class RawSignal:
         if not isinstance(anotaciones, Anotaciones):
             raise TypeError("anotaciones debe ser una instancia de Anotaciones.")
 
-        self.anotaciones = anotaciones
+        self.anotaciones = anotaciones if anotaciones is not None else Anotaciones()
         return self
 
     def __getitem__(self, item):

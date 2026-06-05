@@ -1,5 +1,5 @@
 """
-Subpaquete de senales.
+Subpaquete de tpi_analisisdesenales.
 """
 
 __all__ = [

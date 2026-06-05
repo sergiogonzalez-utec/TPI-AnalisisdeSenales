@@ -4,6 +4,8 @@ import pandas as pd
 
 from tpi_analisisdesenales.info.info import Info
 from tpi_analisisdesenales.signals.raw_signal import RawSignal
+from tpi_analisisdesenales.eventos import Anotaciones, Eventos
+from tpi_analisisdesenales.epocas import Epocas
 
 from tpi_analisisdesenales.preprocesamiento.filtros import (
     filtro_notch,
@@ -82,10 +84,11 @@ def limpiar_raw(raw):
     raw_limpia = RawSignal(
         data=data_limpia,
         info=raw.info,
+        anotaciones=raw.anotaciones,
+        eventos=raw.eventos,
     )
 
     return raw_limpia
-
 
 def main():
     ruta = "docs/senal.txt"
@@ -93,6 +96,18 @@ def main():
     raw = leer_openbci_txt(
         ruta=ruta,
         sfreq=250,
+    )
+
+    raw.anotaciones.add_annotation(
+        onset=6.0,
+        duration=1.5,
+        description="Artefacto"
+    )
+
+    raw.anotaciones.add_annotation(
+        onset=25.0,
+        duration=0.0,
+        description="Evento"
     )
 
     raw_limpia = limpiar_raw(raw)
@@ -104,10 +119,48 @@ def main():
         superpose=False,
         show_annotations=True,
         fill_annotations=True,
-        normalize=True,
         title="Senales filtradas",
         show=True,
     )
+
+    raw_limpia.anotaciones = Anotaciones()
+
+    raw_limpia.anotaciones.add_annotation(
+        onset=10.0,
+        duration=2.0,
+        description="Artefacto: movimiento",
+    )
+
+    raw_limpia.anotaciones.add_annotation(
+        onset=25.0,
+        duration=0.0,
+        description="Evento puntual",
+    )
+
+    eventos = Eventos(sfreq=raw_limpia.sfreq)
+
+    eventos.add_event(
+        onset=12.0,
+        event_id=1,
+        description="Estimulo 1",
+    )
+
+    eventos.add_event(
+        onset=20.0,
+        event_id=1,
+        description="Estimulo 1",
+    )
+
+    epocas = Epocas(
+        raw=raw_limpia,
+        eventos=eventos,
+        tmin=-0.5,
+        tmax=1.0,
+    )
+
+    print(epocas)
+    print(epocas.get_data().shape)
+    print(epocas.average().shape)
 
 
 if __name__ == "__main__":
