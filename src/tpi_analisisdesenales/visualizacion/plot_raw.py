@@ -3,6 +3,7 @@ Modulo para graficar objetos RawSignal usando PlotEngine.
 """
 
 from typing import Optional, Sequence
+
 from .plot_engine import PlotEngine
 
 
@@ -14,10 +15,12 @@ def plot_raw(
     superpose: bool = False,
     show_annotations: bool = True,
     fill_annotations: bool = True,
+    normalize: bool = True,
     title: str = "Visualizacion de senal continua",
+    show: bool = True,
 ):
     """
-    Grafica un objeto RawSignal usando el motor grafico.
+    Grafica un objeto RawSignal usando PlotEngine.
 
     Parameters
     ----------
@@ -44,8 +47,15 @@ def plot_raw(
     fill_annotations : bool
         Indica si las anotaciones se muestran como zonas sombreadas.
 
+    normalize : bool
+        Si es True, normaliza cada canal solo para visualizacion.
+
     title : str
         Titulo del grafico.
+
+    show : bool
+        Si es True, muestra la figura con fig.show().
+        Si es False, solo devuelve la figura.
 
     Returns
     -------
@@ -63,15 +73,18 @@ def plot_raw(
     )
 
     fig = engine.plot_signals(
-        picks=picks,
-        start=start,
-        stop=stop,
-        superpose=superpose,
-        show_annotations=show_annotations,
-        fill_annotations=fill_annotations,
-        title=title,
-    )
-    fig.show()
+    picks=picks,
+    start=start,
+    stop=stop,
+    superpose=superpose,
+    show_annotations=show_annotations,
+    fill_annotations=fill_annotations,
+    normalize=normalize,
+    title=title,
+)
+    if show:
+        fig.show()
+
     return fig
 
 
@@ -83,7 +96,13 @@ def _prepare_annotations(raw):
     onset, duration y description.
     """
 
-    if raw.anotaciones is None or len(raw.anotaciones) == 0:
+    if not hasattr(raw, "anotaciones"):
+        return []
+
+    if raw.anotaciones is None:
+        return []
+
+    if len(raw.anotaciones) == 0:
         return []
 
     df = raw.anotaciones.get_annotations()

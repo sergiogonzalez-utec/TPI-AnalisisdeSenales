@@ -231,7 +231,8 @@ class PlotEngine:
         superpose=False,
         show_annotations=True,
         fill_annotations=True,
-        title="Visualizacion de señal",
+        normalize=True,
+        title="Visualizacion de senal",
     ):
         """
         Grafica uno o varios canales.
@@ -251,6 +252,8 @@ class PlotEngine:
             Si es True, dibuja anotaciones.
         fill_annotations : bool
             Si es True, sombrea la duracion de la anotacion.
+        normalize : bool
+            Si es True, normaliza cada canal solo para visualizacion.
         title : str
             Titulo del grafico.
 
@@ -260,43 +263,48 @@ class PlotEngine:
             Figura generada.
         """
 
-        # Obtenemos el recorte a mostrar.
         segment_data, segment_times, indices = self._get_segment(
             picks=picks,
             start=start,
             stop=stop,
         )
 
-        # Creamos la figura.
         fig = go.Figure()
 
-        # Este desplazamiento vertical se usa solo si NO superponemos.
-        # Asi evitamos que todas las curvas queden una encima de otra.
-        offset_step = 0.0
-        if not superpose:
-            # Elegimos un desplazamiento segun la amplitud del recorte.
-            # Si la señal es casi plana, usamos un valor minimo.
-            max_amp = np.max(np.abs(segment_data)) if segment_data.size > 0 else 1.0
-            offset_step = max(max_amp * 2.5, 1.0)
+        yticks = []
+        ylabels = []
 
-        # Agregamos cada canal como una traza.
+        if not superpose:
+            offset_step = 3.0
+        else:
+            offset_step = 0.0
+
         for i, ch_idx in enumerate(indices):
             y = segment_data[i].copy()
 
-            # Si no queremos superponer, desplazamos cada canal.
+            if normalize:
+                y = y - np.nanmean(y)
+                max_abs = np.nanmax(np.abs(y))
+
+                if max_abs != 0:
+                    y = y / max_abs
+
             if not superpose:
-                y = y + i * offset_step
+                offset = i * offset_step
+                y = y + offset
+                yticks.append(offset)
+                ylabels.append(self.ch_names[ch_idx])
 
             fig.add_trace(
-                go.Scatter(
+                go.Scattergl(
                     x=segment_times,
                     y=y,
                     mode="lines",
                     name=self.ch_names[ch_idx],
+                    line=dict(width=1.2),
                 )
             )
 
-        # Agregamos anotaciones si corresponde.
         if show_annotations:
             visibles = self._get_visible_annotations(start=start, stop=stop)
 
@@ -305,38 +313,54 @@ class PlotEngine:
                 duration = anot["duration"]
                 description = anot["description"]
 
-                # Linea vertical en el onset.
-                fig.add_vline(
-                    x=onset,
-                    line_dash="dash",
-                    annotation_text=description,
-                    annotation_position="top right",
-                )
-
-                # Sombreado opcional de la duracion.
                 if fill_annotations and duration > 0:
                     fig.add_vrect(
                         x0=onset,
                         x1=onset + duration,
-                        opacity=0.15,
+                        opacity=0.18,
                         line_width=0,
+                        annotation_text=description,
+                        annotation_position="top left",
+                    )
+                else:
+                    fig.add_vline(
+                        x=onset,
+                        line_dash="dash",
+                        line_width=1,
+                        annotation_text=description,
+                        annotation_position="top right",
                     )
 
-        # Configuramos layout general.
         fig.update_layout(
             title=title,
             xaxis_title="Tiempo [s]",
-            yaxis_title="Amplitud",
+            yaxis_title="Canales" if not superpose else "Amplitud",
+            template="plotly_white",
             hovermode="x unified",
+            height=750,
+            margin=dict(l=90, r=40, t=80, b=60),
+            legend_title="Canales",
         )
 
-        # Agregamos slider para navegar mas comodamente.
-        fig.update_layout(
-            xaxis=dict(
-                rangeslider=dict(visible=True),
-                type="linear",
-            )
+        fig.update_xaxes(
+            rangeslider=dict(visible=True),
+            type="linear",
+            showgrid=True,
         )
+
+        if not superpose:
+            fig.update_yaxes(
+                tickmode="array",
+                tickvals=yticks,
+                ticktext=ylabels,
+                showgrid=True,
+                zeroline=False,
+            )
+        else:
+            fig.update_yaxes(
+                showgrid=True,
+                zeroline=False,
+            )
 
         return fig
 
