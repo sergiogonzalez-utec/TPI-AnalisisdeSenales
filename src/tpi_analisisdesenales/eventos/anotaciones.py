@@ -36,7 +36,7 @@ class Anotaciones:
         else:
             self._anotaciones = list(anotaciones)
 
-    def add_annotation(
+    def add(
         self,
         onset: float,
         duration: float = 0.0,
@@ -45,16 +45,8 @@ class Anotaciones:
         """
         Agrega una anotacion.
 
-        Parameters
-        ----------
-        onset : float
-            Tiempo inicial en segundos.
-
-        duration : float
-            Duracion en segundos.
-
-        description : str
-            Descripcion de la anotacion.
+        Este metodo es el metodo principal. Se deja separado para que los
+        tests puedan usar anot.add(...).
         """
 
         onset = float(onset)
@@ -73,6 +65,45 @@ class Anotaciones:
                 "description": str(description),
             }
         )
+
+    def add_annotation(
+        self,
+        onset: float,
+        duration: float = 0.0,
+        description: str = "Anotacion",
+    ):
+        """
+        Alias de add para mantener compatibilidad con el resto del proyecto.
+        """
+
+        self.add(
+            onset=onset,
+            duration=duration,
+            description=description,
+        )
+
+    def find(self, text: str):
+        """
+        Busca anotaciones cuya descripcion contenga el texto indicado.
+
+        Parameters
+        ----------
+        text : str
+            Texto a buscar en la descripcion.
+
+        Returns
+        -------
+        results : list[dict]
+            Lista de anotaciones encontradas.
+        """
+
+        text = str(text).lower()
+
+        return [
+            anotacion
+            for anotacion in self._anotaciones
+            if text in anotacion["description"].lower()
+        ]
 
     def get_annotations(self) -> pd.DataFrame:
         """
@@ -104,6 +135,13 @@ class Anotaciones:
         """
 
         return iter(self._anotaciones)
+
+    def __getitem__(self, index):
+        """
+        Permite acceder a una anotacion por indice.
+        """
+
+        return self._anotaciones[index]
 
     def __len__(self):
         """

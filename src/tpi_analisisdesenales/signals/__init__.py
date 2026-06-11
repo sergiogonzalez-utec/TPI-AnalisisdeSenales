@@ -1,4 +1,6 @@
 """
-Paquete principal de signals.
+Modulo signals.
 """
-__all__ = ["RawSignal", "EEGSignal", "ECGSignal", "EMGSignal"]
+
+from .raw_signal import RawSignal
+from .ecg_signal import ECGSignal
