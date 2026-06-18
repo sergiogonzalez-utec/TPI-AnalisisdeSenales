@@ -44,6 +44,7 @@ pip install -e ".[dev]"
 TPI-AnalisisdeSenales/
 |-- pyproject.toml
 |-- readme.md
+|-- probar_eeg.py              # script de ejemplo con una senal EEG real
 |-- src/
 |   |-- tpi_analisisdesenales/
 |       |-- __init__.py
@@ -53,7 +54,17 @@ TPI-AnalisisdeSenales/
 |       |-- epocas/            # clase Epocas
 |       |-- preprocesamiento/  # filtros (pasabanda, notch, Hilbert, etc.)
 |       |-- visualizacion/     # PlotEngine, plot_raw, plot_epochs
-|-- tests/                     # tests de pytest
+|-- tests/
+|   |-- test_info.py
+|   |-- test_anotaciones.py
+|   |-- test_eventos.py
+|   |-- test_rawsignal.py
+|   |-- test_eeg.py
+|   |-- test_ecg.py
+|   |-- test_emg.py
+|   |-- test_epocas.py
+|   |-- test_plot_engine.py
+|   |-- test_plot_signals.py
 |-- docs/
     |-- UML/                   # diagrama UML
 ```
@@ -72,6 +83,16 @@ se muestra el resultado `PASSED`/`FAILED` de cada test. Para una salida compacta
 ```bash
 python -m pytest -q
 ```
+
+Para correr solo los tests de una clase:
+
+```bash
+python -m pytest tests/test_rawsignal.py
+```
+
+La carpeta `tests/` incluye un archivo por clase/modulo (Info, Anotaciones, Eventos,
+RawSignal, EEGSignal, ECGSignal, EMGSignal, Epocas y visualizacion), cubriendo tanto
+casos validos como casos de error.
 
 ## Ejemplo minimo de uso
 
