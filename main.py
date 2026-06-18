@@ -29,7 +29,6 @@ from tpi_analisisdesenales.visualizacion.plot_epochs import plot_epochs
 
 RUTA_ARCHIVO = "docs/senal.txt"
 
-
 FORMATO_ARCHIVO = "openbci"
 # Opciones:
 # "openbci"
