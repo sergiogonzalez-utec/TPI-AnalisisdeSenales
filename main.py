@@ -30,7 +30,7 @@ from tpi_analisisdesenales.visualizacion.plot_epochs import plot_epochs
 # Frecuencias de muestreo reales de cada archivo.
 SFREQ_ECG = 200.0  # OpenBCI (cabecera: Sample Rate = 200 Hz)
 SFREQ_EMG = 200.0  # OpenBCI (cabecera: Sample Rate = 200 Hz)
-SFREQ_EEG = 1000.0
+SFREQ_EEG = 1000.0 
 
 # Cada entrada describe una senal a procesar y graficar.
 # Formato:
@@ -124,38 +124,38 @@ SENALES = [
 # LECTURA DE ARCHIVOS
 # ============================================================
 
-def leer_archivo(ruta, formato, columnas_canales):
+def leer_archivo(ruta, formato, columnas_canales): 
     """
     Lee un archivo y devuelve data con forma:
     n_canales x n_muestras.
     """
 
-    ruta = Path(ruta)
+    ruta = Path(ruta) 
 
-    if not ruta.exists():
+    if not ruta.exists(): 
         raise FileNotFoundError(f"No se encontro el archivo: {ruta}")
 
-    formato = formato.lower()
+    formato = formato.lower() # Normalizamos el formato a minusculas para evitar errores por mayusculas.
 
-    if formato == "openbci":
+    if formato == "openbci": # Leemos el formato de texto estilo OpenBCI, que tiene una estructura particular con comentarios y encabezados.
         return leer_openbci_txt(
             ruta=ruta,
             columnas_canales=columnas_canales,
         )
 
-    if formato == "csv":
+    if formato == "csv": # Leemos un archivo CSV generico, asumiendo que las columnas indicadas contienen los canales de interes.
         return leer_csv_generico(
             ruta=ruta,
             columnas_canales=columnas_canales,
         )
 
-    if formato == "espacios":
+    if formato == "espacios": 
         return leer_txt_espacios(
             ruta=ruta,
             columnas_canales=columnas_canales,
         )
 
-    raise ValueError("formato debe ser 'openbci', 'csv' o 'espacios'.")
+    raise ValueError("formato debe ser 'openbci', 'csv' o 'espacios'.") 
 
 
 def leer_openbci_txt(ruta, columnas_canales):
@@ -163,7 +163,7 @@ def leer_openbci_txt(ruta, columnas_canales):
     Lee un archivo TXT estilo OpenBCI.
     """
 
-    df = pd.read_csv(
+    df = pd.read_csv( # Leemos el archivo con pandas, usando el caracter '%' como comentario para ignorar las lineas de encabezado y comentarios.
         ruta,
         header=None,
         comment="%",
@@ -275,14 +275,14 @@ def crear_senal(data, sfreq, tipo_senal):
     Crea RawSignal, EEGSignal, ECGSignal o EMGSignal.
     """
 
-    tipo_senal = tipo_senal.lower()
+    tipo_senal = tipo_senal.lower() 
 
     ch_names, ch_types = crear_nombres_y_tipos(
         data=data,
         tipo_senal=tipo_senal,
     )
 
-    anotaciones = Anotaciones()
+    anotaciones = Anotaciones() 
     eventos = Eventos(sfreq=sfreq)
 
     if tipo_senal == "raw":
