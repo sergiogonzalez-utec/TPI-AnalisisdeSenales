@@ -42,3 +42,6 @@ htmlcov/
 # Archivos temporales varios
 *.tmp
 *.log
+
+# Graficas generadas por main.py
+*.html
