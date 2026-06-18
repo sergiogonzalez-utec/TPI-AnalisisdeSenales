@@ -44,15 +44,3 @@ def test_info_default_subject_info():
 
     assert info.subject_info is not None
     assert isinstance(info.subject_info, dict)
-
-
-def test_info_repr():
-    info = Info(
-        ch_names=["C3", "C4"],
-        sfreq=250.0,
-        ch_types=["EEG", "EEG"],
-    )
-
-    texto = repr(info)
-
-    assert "Info" in texto

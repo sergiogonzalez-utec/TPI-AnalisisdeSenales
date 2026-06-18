@@ -1,26 +1,18 @@
 import numpy as np
 import pytest
 
+from tpi_analisisdesenales.eventos import Anotaciones
 from tpi_analisisdesenales.visualizacion import PlotEngine
 
 
-class DummyAnotaciones:
+def _anotaciones_de_prueba():
     """
-    Clase simple de apoyo para simular anotaciones en los tests.
-    La usamos para no depender todavia de la clase real Anotaciones.
+    Construye un objeto Anotaciones real con dos anotaciones de ejemplo.
     """
-
-    def __iter__(self):
-        yield {
-            "onset": 1.0,
-            "duration": 0.5,
-            "description": "Evento_1",
-        }
-        yield {
-            "onset": 2.5,
-            "duration": 0.2,
-            "description": "Evento_2",
-        }
+    anotaciones = Anotaciones()
+    anotaciones.add(onset=1.0, duration=0.5, description="Evento_1")
+    anotaciones.add(onset=2.5, duration=0.2, description="Evento_2")
+    return anotaciones
 
 
 def test_plot_engine_init_ok():
@@ -147,7 +139,7 @@ def test_get_visible_annotations():
     Verifica que solo se obtengan anotaciones visibles en el rango.
     """
     data = np.random.randn(2, 1000)
-    anotaciones = DummyAnotaciones()
+    anotaciones = _anotaciones_de_prueba()
 
     engine = PlotEngine(
         data=data,
@@ -181,7 +173,7 @@ def test_plot_signals_with_annotations():
     Verifica que el grafico se genere correctamente aun con anotaciones.
     """
     data = np.random.randn(2, 1000)
-    anotaciones = DummyAnotaciones()
+    anotaciones = _anotaciones_de_prueba()
 
     engine = PlotEngine(
         data=data,
