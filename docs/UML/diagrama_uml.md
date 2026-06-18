@@ -1,8 +1,5 @@
 # Diagrama UML - TPI Analisis de Senales
 
-Diagrama de clases actual de la libreria. Se renderiza automaticamente en GitHub
-y en VS Code (extension Markdown Preview Mermaid).
-
 ```mermaid
 classDiagram
     direction TB
