@@ -1,0 +1,16 @@
+name: senales
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10
+  - numpy>=1.24
+  - pandas>=1.5
+  - scipy>=1.10
+  - plotly>=5.0
+  # desarrollo / testing
+  - pytest>=7.0
+  - black>=23.0
+  - ruff>=0.1
+  - pip
+  - pip:
+      - -e .

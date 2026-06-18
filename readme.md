@@ -26,6 +26,16 @@ La libreria modela una senal fisiologica y su metadata mediante clases reutiliza
 
 Se recomienda usar un entorno con **Python 3.10 o superior** (por ejemplo, con Miniconda).
 
+Opcion A - crear el entorno conda desde `environment.yml` (instala todas las
+dependencias y la libreria en modo editable):
+
+```bash
+conda env create -f environment.yml
+conda activate senales
+```
+
+Opcion B - instalar manualmente con pip en un entorno ya existente:
+
 ```bash
 # 1. (opcional) crear y activar un entorno
 conda create -n senales python=3.10
