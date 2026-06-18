@@ -5,20 +5,39 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "TPI-ANALISISDESENALES"
 version = "0.1.0"
-description = "Libreria para analisis y procesamiento de senales fisiologicas."
+description = "Libreria para procesamiento, analisis y visualizacion de senales EEG, ECG y EMG."
 readme = "readme.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "FLORIN Matias" },
+    { name = "GONZALEZ Sergio" },
+]
+keywords = ["EEG", "ECG", "EMG", "procesamiento de senales", "ingenieria biomedica"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
 dependencies = [
-    "numpy",
-    "scipy",
-    "matplotlib",
-    "pandas",
-    "pytest",
-    "plotly"
+    "numpy>=1.24",
+    "pandas>=1.5",
+    "scipy>=1.10",
+    "plotly>=5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=23.0",
+    "ruff>=0.1",
 ]
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -26,3 +45,12 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+addopts = "-v"
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
