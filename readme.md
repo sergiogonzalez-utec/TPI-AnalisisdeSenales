@@ -44,7 +44,8 @@ pip install -e ".[dev]"
 TPI-AnalisisdeSenales/
 |-- pyproject.toml
 |-- readme.md
-|-- probar_eeg.py              # script de ejemplo con una senal EEG real
+|-- environment.yml            # entorno conda
+|-- main.py                    # script de ejemplo: procesa y grafica ECG, EEG y EMG
 |-- src/
 |   |-- tpi_analisisdesenales/
 |       |-- __init__.py
@@ -67,6 +68,9 @@ TPI-AnalisisdeSenales/
 |   |-- test_plot_signals.py
 |-- docs/
     |-- UML/                   # diagrama UML
+    |-- senal_ecg.txt          # senal ECG de ejemplo (formato OpenBCI)
+    |-- senal_eeg.txt          # senal EEG de ejemplo (32 canales)
+    |-- senal_emg.txt          # senal EMG de ejemplo (formato OpenBCI)
 ```
 
 ## Como ejecutar los tests
@@ -127,3 +131,25 @@ ecg.set_anotaciones(anot)
 picos_r = ecg.detectar_picos_r()              # deteccion de picos R
 print("Picos R detectados:", len(picos_r))
 ```
+
+## Script de ejemplo (`main.py`)
+
+El archivo `main.py` es un ejemplo completo de extremo a extremo. Procesa y grafica
+las tres senales reales incluidas en `docs/` (ECG, EEG y EMG):
+
+```bash
+python main.py
+```
+
+Para cada senal, el script:
+
+1. Lee el archivo segun su formato (`openbci`, `csv` o `espacios`).
+2. Crea la senal del tipo correspondiente (`ECGSignal`, `EEGSignal`, `EMGSignal`).
+3. Agrega anotaciones y eventos propios de esa senal.
+4. Filtra la senal y la segmenta en epocas (con su ventana `tmin`/`tmax`).
+5. Genera graficos HTML interactivos (senal filtrada y epocas individuales) y los abre
+   en el navegador.
+
+La lista `SENALES` al inicio de `main.py` define, por cada senal, su ruta, formato,
+frecuencia de muestreo, canales, anotaciones, eventos y ventana de epocas, de modo que
+es facil ajustar cada caso de forma independiente.
