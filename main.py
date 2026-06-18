@@ -27,29 +27,97 @@ from tpi_analisisdesenales.visualizacion.plot_epochs import plot_epochs
 # CONFIGURACION
 # ============================================================
 
-RUTA_ARCHIVO = "docs/senal.txt"
+# Frecuencias de muestreo reales de cada archivo.
+SFREQ_ECG = 200.0  # OpenBCI (cabecera: Sample Rate = 200 Hz)
+SFREQ_EMG = 200.0  # OpenBCI (cabecera: Sample Rate = 200 Hz)
+SFREQ_EEG = 1000.0
 
-FORMATO_ARCHIVO = "openbci"
-# Opciones:
-# "openbci"
-# "csv"
-
-TIPO_SENAL = "eeg"
-# Opciones:
-# "raw"
-# "eeg"
-# "ecg"
-# "emg"
-
-SFREQ = 250.0
-
-COLUMNAS_CANALES = (1, 2, 3, 4)
-# OpenBCI:
-# columna 0: indice de muestra
-# columnas 1 a 4: canales EXG
+# Cada entrada describe una senal a procesar y graficar.
+# Formato:
+#   "openbci"  -> TXT estilo OpenBCI (columna 0 = indice de muestra,
+#                 columnas 1 a 4 = canales EXG).
+#   "csv"      -> CSV generico separado por comas.
+#   "espacios" -> TXT separado por espacios, con fila de encabezados
+#                 (canales en las columnas indicadas).
 #
-# CSV generico con solo canales:
-# COLUMNAS_CANALES = (0, 1, 2, 3)
+# Tipo de senal: "raw", "eeg", "ecg" o "emg".
+
+SENALES = [
+    {
+        "ruta": "docs/senal_ecg.txt",
+        "formato": "openbci",
+        "tipo_senal": "ecg",
+        "sfreq": SFREQ_ECG,
+        "columnas_canales": (1, 2, 3, 4),
+        # Ventana de epoca centrada en el latido (complejo QRS).
+        "tmin": -0.2,
+        "tmax": 0.6,
+        "anotaciones": [
+            {"onset": 5.0, "duration": 1.0, "description": "Artefacto de movimiento"},
+            {"onset": 15.0, "duration": 0.0, "description": "Extrasistole"},
+            {"onset": 28.0, "duration": 2.0, "description": "Linea de base inestable"},
+        ],
+        # 6 epocas.
+        "eventos": [
+            {"onset": 8.0, "event_id": 1, "description": "Latido normal"},
+            {"onset": 18.0, "event_id": 1, "description": "Latido normal"},
+            {"onset": 25.0, "event_id": 1, "description": "Latido normal"},
+            {"onset": 35.0, "event_id": 2, "description": "Latido anormal"},
+            {"onset": 45.0, "event_id": 2, "description": "Latido anormal"},
+            {"onset": 52.0, "event_id": 2, "description": "Latido anormal"},
+        ],
+    },
+    {
+        "ruta": "docs/senal_eeg.txt",
+        "formato": "espacios",
+        "tipo_senal": "eeg",
+        "sfreq": SFREQ_EEG,
+        # Archivo de 32 columnas (Fp1, Fp2, ... ECG).
+        # Tomamos los 32 canales.
+        "columnas_canales": tuple(range(32)),
+        # Ventana de epoca tipo ERP (respuesta al estimulo).
+        "tmin": -0.2,
+        "tmax": 0.8,
+        "anotaciones": [
+            {"onset": 7.0, "duration": 0.5, "description": "Parpadeo"},
+            {"onset": 22.0, "duration": 1.5, "description": "Artefacto muscular"},
+            {"onset": 40.0, "duration": 0.0, "description": "Ojos abiertos"},
+        ],
+        # 8 epocas.
+        "eventos": [
+            {"onset": 10.0, "event_id": 1, "description": "Estimulo visual"},
+            {"onset": 20.0, "event_id": 1, "description": "Estimulo visual"},
+            {"onset": 30.0, "event_id": 1, "description": "Estimulo visual"},
+            {"onset": 45.0, "event_id": 1, "description": "Estimulo visual"},
+            {"onset": 55.0, "event_id": 2, "description": "Estimulo auditivo"},
+            {"onset": 70.0, "event_id": 2, "description": "Estimulo auditivo"},
+            {"onset": 90.0, "event_id": 2, "description": "Estimulo auditivo"},
+            {"onset": 110.0, "event_id": 2, "description": "Estimulo auditivo"},
+        ],
+    },
+    {
+        "ruta": "docs/senal_emg.txt",
+        "formato": "openbci",
+        "tipo_senal": "emg",
+        "sfreq": SFREQ_EMG,
+        "columnas_canales": (1, 2, 3, 4),
+        # Ventana de epoca corta alrededor de la contraccion.
+        "tmin": -0.1,
+        "tmax": 0.5,
+        "anotaciones": [
+            {"onset": 2.3, "duration": 0.9, "description": "Contraccion sostenida"},
+            {"onset": 16.0, "duration": 0.0, "description": "Pico de fuerza"},
+            {"onset": 30.0, "duration": 3.0, "description": "Fatiga muscular"},
+        ],
+        # 4 epocas.
+        "eventos": [
+            {"onset": 6.0, "event_id": 1, "description": "Contraccion"},
+            {"onset": 14.0, "event_id": 1, "description": "Contraccion"},
+            {"onset": 24.0, "event_id": 2, "description": "Reposo"},
+            {"onset": 34.0, "event_id": 2, "description": "Reposo"},
+        ],
+    },
+]
 
 
 # ============================================================
@@ -81,7 +149,13 @@ def leer_archivo(ruta, formato, columnas_canales):
             columnas_canales=columnas_canales,
         )
 
-    raise ValueError("formato debe ser 'openbci' o 'csv'.")
+    if formato == "espacios":
+        return leer_txt_espacios(
+            ruta=ruta,
+            columnas_canales=columnas_canales,
+        )
+
+    raise ValueError("formato debe ser 'openbci', 'csv' o 'espacios'.")
 
 
 def leer_openbci_txt(ruta, columnas_canales):
@@ -115,6 +189,27 @@ def leer_csv_generico(ruta, columnas_canales):
     """
 
     df = pd.read_csv(ruta)
+
+    data = df.iloc[:, list(columnas_canales)].to_numpy(dtype=float)
+
+    # La libreria usa n_canales x n_muestras.
+    data = data.T
+
+    return data
+
+
+def leer_txt_espacios(ruta, columnas_canales):
+    """
+    Lee un archivo TXT separado por espacios con una fila
+    de encabezados (nombres de canal) en la primera linea.
+    """
+
+    df = pd.read_csv(
+        ruta,
+        sep=r"\s+",
+        header=0,
+        skip_blank_lines=True,
+    )
 
     data = df.iloc[:, list(columnas_canales)].to_numpy(dtype=float)
 
@@ -294,7 +389,11 @@ def limpiar_senal(senal, tipo_senal):
         return senal.filtrar()
 
     if tipo_senal == "emg":
-        return senal.filtrar()
+        # El pasabanda EMG por defecto llega a 150 Hz; lo limitamos
+        # para no superar la frecuencia de Nyquist de la senal.
+        nyquist = senal.sfreq / 2.0
+        h_freq = min(150.0, nyquist * 0.9)
+        return senal.filtrar(h_freq=h_freq)
 
     data_limpia = filtrar_data_general(
         data=senal.data,
@@ -314,58 +413,30 @@ def limpiar_senal(senal, tipo_senal):
 # ANOTACIONES Y EVENTOS
 # ============================================================
 
-def agregar_anotaciones_de_prueba(senal):
+def agregar_anotaciones(senal, anotaciones):
     """
-    Agrega anotaciones visibles en la senal continua.
-    """
-
-    senal.anotaciones.add_annotation(
-        onset=6.0,
-        duration=1.5,
-        description="Artefacto",
-    )
-
-    senal.anotaciones.add_annotation(
-        onset=18.0,
-        duration=0.0,
-        description="Evento puntual",
-    )
-
-    senal.anotaciones.add_annotation(
-        onset=32.0,
-        duration=2.0,
-        description="Movimiento",
-    )
-
-
-def agregar_eventos_de_prueba(senal):
-    """
-    Agrega eventos para crear epocas.
+    Agrega a la senal las anotaciones definidas en la config.
     """
 
-    senal.eventos.add_event(
-        onset=10.0,
-        event_id=1,
-        description="Estimulo A",
-    )
+    for anotacion in anotaciones:
+        senal.anotaciones.add_annotation(
+            onset=anotacion["onset"],
+            duration=anotacion["duration"],
+            description=anotacion["description"],
+        )
 
-    senal.eventos.add_event(
-        onset=20.0,
-        event_id=1,
-        description="Estimulo A",
-    )
 
-    senal.eventos.add_event(
-        onset=30.0,
-        event_id=2,
-        description="Estimulo B",
-    )
+def agregar_eventos(senal, eventos):
+    """
+    Agrega a la senal los eventos definidos en la config.
+    """
 
-    senal.eventos.add_event(
-        onset=40.0,
-        event_id=2,
-        description="Estimulo B",
-    )
+    for evento in eventos:
+        senal.eventos.add_event(
+            onset=evento["onset"],
+            event_id=evento["event_id"],
+            description=evento["description"],
+        )
 
 
 # ============================================================
@@ -434,31 +505,49 @@ def mostrar_resumen(senal, senal_limpia, epocas):
 # MAIN
 # ============================================================
 
-def main():
+def procesar_senal(config, indice):
+    """
+    Procesa y grafica una senal segun su configuracion.
+    """
+
+    ruta = config["ruta"]
+    formato = config["formato"]
+    tipo_senal = config["tipo_senal"]
+    sfreq = config["sfreq"]
+    columnas_canales = config["columnas_canales"]
+    anotaciones = config["anotaciones"]
+    eventos = config["eventos"]
+    tmin = config["tmin"]
+    tmax = config["tmax"]
+
+    print("\n" + "#" * 60)
+    print(f"# PROCESANDO SENAL {tipo_senal.upper()} ({ruta})")
+    print("#" * 60)
+
     data = leer_archivo(
-        ruta=RUTA_ARCHIVO,
-        formato=FORMATO_ARCHIVO,
-        columnas_canales=COLUMNAS_CANALES,
+        ruta=ruta,
+        formato=formato,
+        columnas_canales=columnas_canales,
     )
 
     senal = crear_senal(
         data=data,
-        sfreq=SFREQ,
-        tipo_senal=TIPO_SENAL,
+        sfreq=sfreq,
+        tipo_senal=tipo_senal,
     )
 
-    agregar_anotaciones_de_prueba(senal)
-    agregar_eventos_de_prueba(senal)
+    agregar_anotaciones(senal, anotaciones)
+    agregar_eventos(senal, eventos)
 
     senal_limpia = limpiar_senal(
         senal=senal,
-        tipo_senal=TIPO_SENAL,
+        tipo_senal=tipo_senal,
     )
 
     epocas = Epocas(
         raw=senal_limpia,
-        tmin=-0.2,
-        tmax=0.8,
+        tmin=tmin,
+        tmax=tmax,
     )
 
     mostrar_resumen(
@@ -475,31 +564,35 @@ def main():
         show_annotations=True,
         fill_annotations=True,
         normalize=True,
-        title=f"{TIPO_SENAL.upper()} filtrada con anotaciones",
+        title=f"{tipo_senal.upper()} filtrada con anotaciones",
         show=False,
     )
 
     abrir_figura_html(
         fig=fig_raw,
-        nombre_archivo="01_senal_filtrada.html",
+        nombre_archivo=f"{indice:02d}_{tipo_senal}_senal_filtrada.html",
     )
-
-    input("Presiona Enter para mostrar las epocas individuales...")
 
     fig_epocas = plot_epochs(
         epocas,
         picks=senal_limpia.info.ch_names[:2],
-        max_epochs=5,
+        # Mostramos todas las epocas de la senal.
+        max_epochs=epocas.get_data().shape[0],
         superpose=False,
         normalize=True,
-        title=f"Epocas individuales - {TIPO_SENAL.upper()}",
+        title=f"Epocas individuales - {tipo_senal.upper()}",
         show=False,
     )
 
     abrir_figura_html(
         fig=fig_epocas,
-        nombre_archivo="02_epocas_individuales.html",
+        nombre_archivo=f"{indice:02d}_{tipo_senal}_epocas_individuales.html",
     )
+
+
+def main():
+    for indice, config in enumerate(SENALES, start=1):
+        procesar_senal(config=config, indice=indice)
 
 
 if __name__ == "__main__":

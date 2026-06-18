@@ -54,6 +54,8 @@ def plot_epochs(
     times = epocas.times
     ch_names = epocas.ch_names
 
+    descripciones = _obtener_descripciones(epocas, data.shape[0])
+
     indices_canales = _resolver_picks(picks, ch_names)
 
     n_epocas = min(data.shape[0], max_epochs)
@@ -67,6 +69,12 @@ def plot_epochs(
     contador = 0
 
     for epoca_idx in range(n_epocas):
+        descripcion = descripciones[epoca_idx]
+        etiqueta_epoca = f"E{epoca_idx + 1}"
+
+        if descripcion:
+            etiqueta_epoca = f"{etiqueta_epoca} ({descripcion})"
+
         for ch_idx in indices_canales:
             y = data[epoca_idx, ch_idx, :].astype(float)
 
@@ -82,7 +90,7 @@ def plot_epochs(
             else:
                 offset = contador * offset_step
                 yticks.append(offset)
-                ylabels.append(f"E{epoca_idx + 1} - {ch_names[ch_idx]}")
+                ylabels.append(f"{etiqueta_epoca} - {ch_names[ch_idx]}")
                 contador += 1
 
             fig.add_trace(
@@ -90,7 +98,7 @@ def plot_epochs(
                     x=times,
                     y=y + offset,
                     mode="lines",
-                    name=f"Epoca {epoca_idx + 1} - {ch_names[ch_idx]}",
+                    name=f"{etiqueta_epoca} - {ch_names[ch_idx]}",
                     line=dict(width=1.1),
                 )
             )
@@ -99,7 +107,7 @@ def plot_epochs(
         x=0,
         line_dash="dash",
         line_width=1,
-        annotation_text="Evento",
+        annotation_text=_texto_evento(descripciones[:n_epocas]),
         annotation_position="top",
     )
 
@@ -176,6 +184,8 @@ def plot_epochs_average(
     times = epocas.times
     ch_names = epocas.ch_names
 
+    descripciones = _obtener_descripciones(epocas, epocas.get_data().shape[0])
+
     indices_canales = _resolver_picks(picks, ch_names)
 
     fig = go.Figure()
@@ -213,7 +223,7 @@ def plot_epochs_average(
         x=0,
         line_dash="dash",
         line_width=1,
-        annotation_text="Evento",
+        annotation_text=_texto_evento(descripciones),
         annotation_position="top",
     )
 
@@ -245,6 +255,52 @@ def plot_epochs_average(
         fig.show()
 
     return fig
+
+
+def _texto_evento(descripciones):
+    """
+    Construye el texto de la linea de evento (x=0).
+
+    Usa los tipos de evento presentes; si no hay, devuelve "Evento".
+    """
+
+    unicas = []
+
+    for desc in descripciones:
+        if desc and desc not in unicas:
+            unicas.append(desc)
+
+    if not unicas:
+        return "Evento"
+
+    return " / ".join(unicas)
+
+
+def _obtener_descripciones(epocas, n_epocas):
+    """
+    Devuelve la descripcion del evento de cada epoca.
+
+    Si no hay metadata disponible, devuelve cadenas vacias.
+    """
+
+    descripciones = ["" for _ in range(n_epocas)]
+
+    obtener_metadata = getattr(epocas, "get_metadata", None)
+
+    if obtener_metadata is None:
+        return descripciones
+
+    metadata = obtener_metadata()
+
+    if metadata is None or "description" not in metadata:
+        return descripciones
+
+    valores = list(metadata["description"])
+
+    for i in range(min(n_epocas, len(valores))):
+        descripciones[i] = str(valores[i])
+
+    return descripciones
 
 
 def _resolver_picks(picks, ch_names):
